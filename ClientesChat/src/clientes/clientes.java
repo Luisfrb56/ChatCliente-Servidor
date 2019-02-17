@@ -325,7 +325,7 @@ public class clientes extends javax.swing.JFrame {
 
             is.read(mensaje2);
             
-            taChat.setText(new String(mensaje2));
+            taChat.setText(taChat.getText()+"\n"+(new String(mensaje2)));
             
             jtMensaje.setText("");
            

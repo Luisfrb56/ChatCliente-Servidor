@@ -60,7 +60,7 @@ class cliente extends Thread {
             
 
         try {
-            
+            do{
             byte[] mensaje = new byte[100];
 
             is.read(mensaje);
@@ -70,7 +70,7 @@ class cliente extends Thread {
             os.write(mensaje);
             
 
-            
+            }while(true); 
         } catch (IOException ex) {
             Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
