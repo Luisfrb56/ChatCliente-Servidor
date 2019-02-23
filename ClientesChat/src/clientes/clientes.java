@@ -267,7 +267,11 @@ public class clientes extends javax.swing.JFrame {
                 
                 String conectado=nick+" se ha conectado";
                 
-                //os.write(conectado.getBytes());
+                os.write(conectado.getBytes());
+                byte[] mensaje6 = new byte[100];
+
+                is.read(mensaje6);
+                taChat.setText("Conectado á sala chat");
                 jtNick.setEnabled(false);
                 c += 1;
                 jbConectar.setText("Desconectar");
@@ -282,10 +286,15 @@ public class clientes extends javax.swing.JFrame {
                 jbCerrar.setEnabled(true);
                 String desconectado=nick+" se ha desconectado";
                 
-                //os.write(desconectado.getBytes());
+                os.write(desconectado.getBytes());
+                byte[] mensaje5 = new byte[100];
+
+                is.read(mensaje5);
+                taChat.setText(taChat.getText()+"\n"+(new String(mensaje5)));
                 clienteSocket.close();
                 System.out.println("Terminado");
                 jbConectar.setText("Conectar");
+                c=0;
             }
 
         } catch (IOException e) {
@@ -310,7 +319,27 @@ public class clientes extends javax.swing.JFrame {
             */
             
             
-            
+            if(jtMensaje.getText().equalsIgnoreCase("/bye")){
+                
+                jtMensaje.setEnabled(false);
+                jbEnviar.setEnabled(false);
+                taChat.setEnabled(false);
+                jtNick.setEnabled(true);
+                jtIP.setEnabled(true);
+                jtServer.setEnabled(true);
+                jbCerrar.setEnabled(true);
+                String desconectado=nick+" se ha desconectado";
+                
+                os.write(desconectado.getBytes());
+                byte[] mensaje5 = new byte[100];
+
+                is.read(mensaje5);
+                taChat.setText(taChat.getText()+"\n"+(new String(mensaje5)));
+                clienteSocket.close();
+                System.out.println("Terminado");
+                jbConectar.setText("Conectar");
+                c=0;
+            }else{
             
             System.out.println(jtMensaje.getText());
             
@@ -328,7 +357,7 @@ public class clientes extends javax.swing.JFrame {
             taChat.setText(taChat.getText()+"\n"+(new String(mensaje2)));
             
             jtMensaje.setText("");
-           
+            }
             
             
                 
