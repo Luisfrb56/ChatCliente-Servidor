@@ -17,6 +17,7 @@ public class Servidor {
 
     public static void main(String[] args) {
         int con=0;
+        int contador=0;
         try {
             
             System.out.println("Creando socket servidor");
@@ -31,14 +32,18 @@ public class Servidor {
             
             
             while (con<=10) {
-
+                if(contador!=0){
+                    System.out.println("Actualmente hai "+contador+" clientes");
+                }else{
                 System.out.println("Ningún cliente conectado.");
-                
+                }
                 Socket newSocket = serverSocket.accept();
                 
+               contador+=1;
                
                 new cliente(newSocket).start();
                 con+=1;
+                
             }
             
         } catch (IOException e) {
@@ -74,14 +79,14 @@ class cliente extends Thread {
             byte[] mensaje = new byte[100];
            
             is.read(mensaje);
-            System.out.println(new String(mensaje));
+            
             String men=new String(mensaje);
             
             if(men.contains("/conn")){
                 String[]mensx=men.split("/");
                 
                        
-                   
+                   System.out.println("Nuevo cliente: "+mensx[0]+" / "+mensx[2]+" / "+mensx[3]);
                     String conex=mensx[0]+" se ha conectado";
                     os.write(conex.getBytes());
                    
@@ -91,7 +96,8 @@ class cliente extends Thread {
                    
                     String conexi=mensx[0]+" se ha desconectado";
                     os.write(conexi.getBytes());          
-            }else{            
+            }else{       
+            System.out.println(men);
             os.write(mensaje);
             
             

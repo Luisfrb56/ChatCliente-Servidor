@@ -9,6 +9,7 @@ import java.awt.Image;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Date;
@@ -270,8 +271,8 @@ public class clientes extends javax.swing.JFrame {
                 is = clienteSocket.getInputStream();
                 os= clienteSocket.getOutputStream();
                 nick=jtNick.getText();
-                
-                String conectado=nick+"/conn";
+                String thisIp=InetAddress.getLocalHost().getHostAddress();
+                String conectado=nick+"/conn"+"/"+thisIp+"/"+jtServer.getText();
                 
                 os.write(conectado.getBytes());
                 byte[] mensaje6 = new byte[100];
