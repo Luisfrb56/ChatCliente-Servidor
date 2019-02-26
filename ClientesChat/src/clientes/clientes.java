@@ -14,6 +14,7 @@ import java.net.Socket;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -116,6 +117,10 @@ public class clientes extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Enderezo IP:");
 
+        jtIP.setText("localhost");
+
+        jtServer.setText("1234");
+
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Porto do Servidor:");
@@ -149,9 +154,7 @@ public class clientes extends javax.swing.JFrame {
                     .addComponent(jtIP, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jtServer)
                     .addComponent(jtNick)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jbConectar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jbConectar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
@@ -246,7 +249,10 @@ public class clientes extends javax.swing.JFrame {
              */
 
             if (c == 0) {
-                
+                if(!jtNick.getText().equalsIgnoreCase("")){
+                    
+                    
+                        if(!jtNick.getText().contains(" ")){
                 jtMensaje.setEnabled(true);
                 jbEnviar.setEnabled(true);
                 taChat.setEnabled(true);
@@ -265,17 +271,26 @@ public class clientes extends javax.swing.JFrame {
                 os= clienteSocket.getOutputStream();
                 nick=jtNick.getText();
                 
-                String conectado=nick+" se ha conectado";
+                String conectado=nick+"/conn";
                 
                 os.write(conectado.getBytes());
                 byte[] mensaje6 = new byte[100];
 
                 is.read(mensaje6);
+                
                 taChat.setText("Conectado á sala chat");
+                taChat.setText(taChat.getText()+"\n"+new String(mensaje6));
                 jtNick.setEnabled(false);
                 c += 1;
                 jbConectar.setText("Desconectar");
-
+                        }else{
+                            System.out.println("El nick no puede tener espacios");
+                        }
+                        
+                    }else{
+                    System.out.println("Escribe tu id");
+                    
+                }
             } else {
                 jtMensaje.setEnabled(false);
                 jbEnviar.setEnabled(false);
@@ -284,7 +299,7 @@ public class clientes extends javax.swing.JFrame {
                 jtIP.setEnabled(true);
                 jtServer.setEnabled(true);
                 jbCerrar.setEnabled(true);
-                String desconectado=nick+" se ha desconectado";
+                String desconectado=nick+"/descn";
                 
                 os.write(desconectado.getBytes());
                 byte[] mensaje5 = new byte[100];
@@ -340,7 +355,7 @@ public class clientes extends javax.swing.JFrame {
                 jbConectar.setText("Conectar");
                 c=0;
             }else{
-            
+            if(!jtMensaje.getText().equalsIgnoreCase("")){
             System.out.println(jtMensaje.getText());
             
             Date date=new Date();
@@ -357,6 +372,10 @@ public class clientes extends javax.swing.JFrame {
             taChat.setText(taChat.getText()+"\n"+(new String(mensaje2)));
             
             jtMensaje.setText("");
+            }else{
+                System.out.println("Escribe algun mensaje");
+            }
+                
             }
             
             
