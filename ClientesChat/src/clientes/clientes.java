@@ -5,6 +5,7 @@
  */
 package clientes;
 
+import com.sun.glass.events.KeyEvent;
 import java.awt.Image;
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,6 +79,11 @@ public class clientes extends javax.swing.JFrame {
         jtMensaje.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jtMensajeActionPerformed(evt);
+            }
+        });
+        jtMensaje.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jtMensajeKeyPressed(evt);
             }
         });
 
@@ -264,23 +270,21 @@ public class clientes extends javax.swing.JFrame {
 
                 System.out.println("Creando socket cliente");
                 clienteSocket = new Socket();
+                
                 System.out.println("Estableciendo la conexion");
                 InetSocketAddress addr = new InetSocketAddress(jtIP.getText(), Integer.parseInt(jtServer.getText()));
                 clienteSocket.connect(addr);
                 System.out.println("conexion hecha");
                 is = clienteSocket.getInputStream();
                 os= clienteSocket.getOutputStream();
+                
                 nick=jtNick.getText();
                 String thisIp=InetAddress.getLocalHost().getHostAddress();
-                String conectado=nick+"/conn"+"/"+thisIp+"/"+jtServer.getText();
+                String conectado=nick+"/conn"+"/"+thisIp+"/"+jtIP.getText()+"/"+jtServer.getText();
                 
                 os.write(conectado.getBytes());
-                byte[] mensaje6 = new byte[100];
-
-                is.read(mensaje6);
+                new hilos(clienteSocket).start();
                 
-                taChat.setText("Conectado á sala chat");
-                taChat.setText(taChat.getText()+"\n"+new String(mensaje6));
                 jtNick.setEnabled(false);
                 c += 1;
                 jbConectar.setText("Desconectar");
@@ -303,10 +307,7 @@ public class clientes extends javax.swing.JFrame {
                 String desconectado=nick+"/descn";
                 
                 os.write(desconectado.getBytes());
-                byte[] mensaje5 = new byte[100];
-
-                is.read(mensaje5);
-                taChat.setText(taChat.getText()+"\n"+(new String(mensaje5)));
+                
                 clienteSocket.close();
                 System.out.println("Terminado");
                 jbConectar.setText("Conectar");
@@ -366,11 +367,6 @@ public class clientes extends javax.swing.JFrame {
             
             os.write(mens.getBytes());
             
-            byte[] mensaje2 = new byte[100];
-
-            is.read(mensaje2);
-            
-            taChat.setText(taChat.getText()+"\n"+(new String(mensaje2)));
             
             jtMensaje.setText("");
             }else{
@@ -387,6 +383,36 @@ public class clientes extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jbEnviarActionPerformed
 
+    private void jtMensajeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtMensajeKeyPressed
+            char cTecla=evt.getKeyChar();
+      if(cTecla==KeyEvent.VK_ENTER){
+          jbEnviar.doClick();
+      }
+    }//GEN-LAST:event_jtMensajeKeyPressed
+class hilos extends Thread{
+    private Socket socket;
+    public hilos(Socket socket) throws IOException {
+        this.socket = socket;
+        
+        
+    }
+    public void run(){
+        while (true) {
+                    try {
+                        
+                        byte[] recibido = new byte[500];
+                        is.read(recibido);
+                        String mensaje = new String(recibido);
+                        taChat.setText(taChat.getText()+"\n"+mensaje);
+                
+                    } catch (IOException ex) {
+                        System.out.println("Fallo recibir ");
+                
+                }
+            }
+    }
+}
+    
     /**
      * @param args the command line arguments
      */
@@ -430,6 +456,7 @@ public class clientes extends javax.swing.JFrame {
                 } catch (IOException ex) {
                     Logger.getLogger(clientes.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
                 
                 
             }

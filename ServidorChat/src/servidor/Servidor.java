@@ -33,16 +33,21 @@ public class Servidor {
             
             while (con<=10) {
                 if(contador!=0){
+                    
                     System.out.println("Actualmente hai "+contador+" clientes");
+                    
                 }else{
+                    
                 System.out.println("Ningún cliente conectado.");
+                
                 }
                 Socket newSocket = serverSocket.accept();
                 
-               contador+=1;
                
+                
                 new cliente(newSocket).start();
                 con+=1;
+                
                 
             }
             
@@ -84,32 +89,53 @@ class cliente extends Thread {
             
             if(men.contains("/conn")){
                 String[]mensx=men.split("/");
-                
-                       
-                   System.out.println("Nuevo cliente: "+mensx[0]+" / "+mensx[2]+" / "+mensx[3]);
-                    String conex=mensx[0]+" se ha conectado";
-                    os.write(conex.getBytes());
+                String id=mensx[0];
+                System.out.println(id);
+                   new Clientes(socket,mensx[0]);    
+                   System.out.println("Nuevo cliente: "+mensx[0]+" / "+mensx[2]+" / "+mensx[3]+" / "+mensx[4]);
+                   for (Clientes cli : Clientes.clientes) {
+                            
+                            
+                             String conex=mensx[0]+" se ha conectado";
+                            cli.getSocket().getOutputStream().write(conex.trim().getBytes());
+                                    
+                        
                    
+                    
+                   }
             }else if(men.contains("/descn")){
                 String[]mensx=men.split("/");   
                     
-                   
-                    String conexi=mensx[0]+" se ha desconectado";
-                    os.write(conexi.getBytes());          
+                   for (Clientes cli : Clientes.clientes) {
+                            
+                            
+                             String conexi=mensx[0]+" se ha desconectado";
+                            cli.getSocket().getOutputStream().write(conexi.trim().getBytes());
+
+                   }
+                              
             }else{       
             System.out.println(men);
-            os.write(mensaje);
-            
+
+            for (Clientes cli : Clientes.clientes) {
+
+                            cli.getSocket().getOutputStream().write(men.trim().getBytes());
+
+                   }
             
             }
                 
-            }while(true); 
+            }while(true);
+            
             
         } catch (IOException ex) {
             Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
                 //Cerramos la conexión
+                System.out.println("conexion cerrada");
+                is.close();
+                os.close();
                 socket.close();
             } catch (IOException ex) {
                 System.out.println("Error al cerrar la conexión");
