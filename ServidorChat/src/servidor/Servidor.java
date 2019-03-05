@@ -104,7 +104,11 @@ class cliente extends Thread {
                             // Remove the current element from the iterator and the list.
                             for (Clientes cli : Clientes.clientes) {
                             String conexi = mensx[0] + " se ha desconectado";
+                            String usu = "Actualmente hay " + Clientes.clientes.size() + " clientes conectados";
+                                System.out.println("Actualmente hay " + Clientes.clientes.size() + " clientes conectados");
+                                
                             obj.getSocket().getOutputStream().write(conexi.trim().getBytes());
+                            obj.getSocket().getOutputStream().write(usu.trim().getBytes());
                             }
                             socket.close();
                             des = false;
