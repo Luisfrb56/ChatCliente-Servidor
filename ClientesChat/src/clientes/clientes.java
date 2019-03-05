@@ -350,8 +350,7 @@ public class clientes extends javax.swing.JFrame {
                 os.write(desconectado.getBytes());
                 byte[] mensaje5 = new byte[100];
 
-                is.read(mensaje5);
-                taChat.setText(taChat.getText()+"\n"+(new String(mensaje5)));
+                
                 clienteSocket.close();
                 System.out.println("Terminado");
                 jbConectar.setText("Conectar");

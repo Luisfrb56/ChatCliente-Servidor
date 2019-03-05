@@ -8,6 +8,9 @@ public class Clientes {
      public static  ArrayList<Clientes> clientes = new ArrayList<Clientes>();
       Socket Socket;
       String nick;
+
+    public Clientes() {
+    }
       
     public Clientes(Socket rSocket, String rNick) {
         Socket=rSocket;
@@ -29,5 +32,9 @@ public class Clientes {
 
     public void setNick(String nick) {
         this.nick = nick;
+    }
+    public static void contarclientes(){
+        int num=clientes.size();
+        System.out.println(num);
     }
 }
