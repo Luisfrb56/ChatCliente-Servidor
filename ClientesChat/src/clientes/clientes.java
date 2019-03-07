@@ -24,7 +24,10 @@ import javax.swing.JOptionPane;
  */
 public class clientes extends javax.swing.JFrame {
     
-        
+    /*
+    Creamos el socket del cliente y los input y output stream para enviar y leer mensajes, ademas iniciamos la variable nick para
+    guardar el id de cada cliente, c=0 es para comprobar si hay que desconectar o conectar como veremos abajo.
+    */
     int c = 0;
     Socket clienteSocket;
     static InputStream is;
@@ -32,6 +35,9 @@ public class clientes extends javax.swing.JFrame {
     String nick;
     public clientes() throws IOException {
         initComponents();
+        /*
+        Estas Ima e ima2 son los fondos que tiene cada panel, el del chat y el de la conexión.
+        */
         Imagen1 ima=new Imagen1();
         jPanel1.add(ima);
         jPanel1.repaint();
@@ -39,6 +45,9 @@ public class clientes extends javax.swing.JFrame {
         Imagen2 ima2=new Imagen2();
         jPanel2.add(ima2);
         jPanel2.repaint();
+        /*
+        Ponemos a false los botones del chat hasta que no se producta la conexion.
+        */
                 jtMensaje.setEnabled(false);
                 jbEnviar.setEnabled(false);
                 taChat.setEnabled(false);
@@ -251,15 +260,23 @@ public class clientes extends javax.swing.JFrame {
 
         try {
             /*
-            Abrimos el socket del cliente y establecemos la conexión con el host del servidor
-            ademas creamos ya nuestros Inputs y Outputs Stream que usaremos
+            En el boton conectar vamos a comprobar si hay que conectar o desconectar porque este ejecutara ambas acciones.
+            c=0 en el if para saber si acaba de empezar la aplicacion o si se ha desconectado en algun momento y quiere volver a conectarse.
              */
 
             if (c == 0) {
+                /*
+                Aqui comprobamos que se haya introducido el nick, si no es asi, mandamos un aviso por pantalla de que es necesario.
+                */
                 if(!jtNick.getText().equalsIgnoreCase("")){
                     
-                    
+                    /*
+                    Si hay un nick pero contiene un espacio pedimos que sea sin el.
+                    */    
                         if(!jtNick.getText().contains(" ")){
+                            /*
+                            Una vez dentro activamos los botones del chat y desactivamos el modificar el puerto, ip, o nick a no ser que se desconecte
+                            */
                 jtMensaje.setEnabled(true);
                 jbEnviar.setEnabled(true);
                 taChat.setEnabled(true);
@@ -267,36 +284,59 @@ public class clientes extends javax.swing.JFrame {
                 jtIP.setEnabled(false);
                 jtServer.setEnabled(false);
                 jbCerrar.setEnabled(false);
-
+                /*
+                Inicializamos el socket cliente y establecemos la conexion con la ip y el puerto introducidos en la interfaz.
+                */
                 System.out.println("Creando socket cliente");
                 clienteSocket = new Socket();
                 
                 System.out.println("Estableciendo la conexion");
                 InetSocketAddress addr = new InetSocketAddress(jtIP.getText(), Integer.parseInt(jtServer.getText()));
+                /*
+                Lo metemos en un connect para que se produzca la conexion y inicializamos los input y ouput stream.
+                */
                 clienteSocket.connect(addr);
                 System.out.println("conexion hecha");
                 is = clienteSocket.getInputStream();
                 os= clienteSocket.getOutputStream();
-                
+                /*
+                metemos en la variable nick el id del cliente y guardamos la ip de nuestro cliente
+                y en una variable conectado guardamos el nick, el codigo conn que para tratar la conexion en el servidor
+                y mandamos la direccion ip del cliente, la ip del servidor y el puerto.
+                */
                 nick=jtNick.getText();
                 String thisIp=InetAddress.getLocalHost().getHostAddress();
                 String conectado=nick+"/conn"+"/"+thisIp+"/"+jtIP.getText()+"/"+jtServer.getText();
-                
+                /*
+                Mandamos el mensaje y ejecutamos un hilo que leera todos los mensajes de los clientes.
+                */
                 os.write(conectado.getBytes());
                 new hilos(clienteSocket).start();
                 
                 jtNick.setEnabled(false);
+                /*
+                Cambiamos c a 1 para que entre la proxima vez en desconexion.
+                */
                 c += 1;
                 jbConectar.setText("Desconectar");
                         }else{
+                            /*
+                            El aviso del nick sin espacios
+                            */
                             System.out.println("El nick no puede tener espacios");
                         }
                         
                     }else{
+                    /*
+                    El aviso de nick obligatorio
+                    */
                     System.out.println("Escribe tu id");
                     
                 }
             } else {
+                /*
+                Si nos desconectamos volvemos activar los botones para la conexion y bloqueamos los del chat.
+                */
                 jtMensaje.setEnabled(false);
                 jbEnviar.setEnabled(false);
                 taChat.setEnabled(false);
@@ -304,8 +344,13 @@ public class clientes extends javax.swing.JFrame {
                 jtIP.setEnabled(true);
                 jtServer.setEnabled(true);
                 jbCerrar.setEnabled(true);
+                /*
+                Guardamos el nick y el codigo descn que sera tratado en el servidor
+                */
                 String desconectado=nick+"/descn";
-                
+                /*
+                Mandamos el mensaje y cerramos el socket, igualamos c a 0 por si queremos volver a conectarnos desde esta maquina.
+                */
                 os.write(desconectado.getBytes());
                 
                 clienteSocket.close();
@@ -321,6 +366,9 @@ public class clientes extends javax.swing.JFrame {
     }//GEN-LAST:event_jbConectarActionPerformed
 
     private void jbCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbCerrarActionPerformed
+        /*
+        Un boton cerrar que cierra completamente la aplicacion pero solo si el cliente no esta conectado.
+        */
         System.exit(0);
     }//GEN-LAST:event_jbCerrarActionPerformed
 
@@ -331,11 +379,13 @@ public class clientes extends javax.swing.JFrame {
     private void jbEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbEnviarActionPerformed
         try{
             /*
-            Abrimos el socket del cliente y establecemos la conexión con el host del servidor
-            ademas creamos ya nuestros Inputs y Outputs Stream que usaremos
+            Boton enviar.
             */
             
-            
+            /*
+            Primero tenemos un if para identificar el codigo /bye el cual desconecta al cliente del servidor y bloquea los botones del chat
+            y activa los del apartado conexion.
+            */
             if(jtMensaje.getText().equalsIgnoreCase("/bye")){
                 
                 jtMensaje.setEnabled(false);
@@ -345,29 +395,39 @@ public class clientes extends javax.swing.JFrame {
                 jtIP.setEnabled(true);
                 jtServer.setEnabled(true);
                 jbCerrar.setEnabled(true);
-                String desconectado=nick+" se ha desconectado";
+                /*
+                Envia el mensaje para tratar la desconexion y cierra el socket, c=0 para poder volver a conectarse.
+                */
+                String desconectado=nick+"/descn";
                 
                 os.write(desconectado.getBytes());
-                byte[] mensaje5 = new byte[100];
-
                 
                 clienteSocket.close();
                 System.out.println("Terminado");
                 jbConectar.setText("Conectar");
                 c=0;
             }else{
+            /*
+            Tratamos un error muy comun para no enviar mensajes vacios. 
+            */
             if(!jtMensaje.getText().equalsIgnoreCase("")){
+                
             System.out.println(jtMensaje.getText());
-            
+            /*
+            Desde aqui enviaremos los mensajes que tambien llevaran en todo momento la fecha y la hora del mensaje ademas del nick.
+            */
             Date date=new Date();
             String hora=" ["+date.getDay()+"/"+date.getMonth()+"("+date.getHours()+":"+date.getMinutes()+")"+"]";
             String mens=nick+": "+jtMensaje.getText()+ hora;
             
-            
+            /*
+            Enviamos el mensaje
+            */
             os.write(mens.getBytes());
             
             
             jtMensaje.setText("");
+                
             }else{
                 System.out.println("Escribe algun mensaje");
             }
@@ -383,12 +443,18 @@ public class clientes extends javax.swing.JFrame {
     }//GEN-LAST:event_jbEnviarActionPerformed
 
     private void jtMensajeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtMensajeKeyPressed
-            char cTecla=evt.getKeyChar();
+        /*
+        Esto sirve para que se puedan mandar mensajes solo con el enter.
+        */
+        char cTecla=evt.getKeyChar();
       if(cTecla==KeyEvent.VK_ENTER){
           jbEnviar.doClick();
       }
     }//GEN-LAST:event_jtMensajeKeyPressed
-class hilos extends Thread{
+    /*
+    clase que extiende de hilos y crea un socket hijo
+    */
+    class hilos extends Thread{
     private Socket socket;
     public hilos(Socket socket) throws IOException {
         this.socket = socket;
@@ -398,7 +464,9 @@ class hilos extends Thread{
     public void run(){
         while (true) {
                     try {
-                        
+                        /*
+                        Aqui podemos recibir los mensajes que nos envie el servidor del resto de clientes y msotrarlos en el chat.
+                        */
                         byte[] recibido = new byte[500];
                         is.read(recibido);
                         String mensaje = new String(recibido);
